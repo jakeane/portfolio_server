@@ -4,6 +4,11 @@ import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
 
+import apiRouter from './router';
+import getData from './collector';
+
+const cron = require('node-cron');
+
 // initialize
 const app = express();
 
@@ -31,6 +36,20 @@ app.use(bodyParser.json());
 // default index route
 app.get('/', (req, res) => {
   res.send('hi');
+});
+
+// api for frontend
+app.use('/api', apiRouter);
+
+// default index route
+app.get('/', (req, res) => {
+  res.send('hi');
+});
+
+// scheduled task
+cron.schedule('*/5 * * * * *', () => {
+  console.log('Running process...');
+  getData();
 });
 
 // START THE SERVER
