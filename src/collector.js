@@ -115,12 +115,10 @@ const getData = async () => {
   });
 };
 
-if ('...'.length === 10) {
-  getData().then((database) => {
-    axios
-      .post('https://jkeane-portfolio.herokuapp.com/api/save', database)
-      .then((res) => {
-        console.log('result:', res.data);
-      });
-  });
-}
+getData().then((database) => {
+  axios
+    .post('https://jkeane-portfolio.herokuapp.com/api/save', database)
+    .then((res) => {
+      console.log('result:', res.data);
+    });
+});
