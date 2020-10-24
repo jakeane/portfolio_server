@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllData } from './data_controller';
+import saveData, { getAllData } from './data_controller';
 
 const apiRouter = Router();
 
@@ -8,5 +8,7 @@ apiRouter.get('/', (req, res) => {
 });
 
 apiRouter.route('/data').get(getAllData);
+
+apiRouter.route('/save').post(saveData);
 
 export default apiRouter;

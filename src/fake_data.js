@@ -84,4 +84,4 @@ const fakeData = {
   ],
 };
 
-export default fakeData;
+exports.fakeData = fakeData;

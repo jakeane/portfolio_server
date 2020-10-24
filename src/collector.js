@@ -1,7 +1,8 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable operator-linebreak */
 /* eslint-disable comma-dangle */
-import axios from 'axios';
+
+const axios = require('axios');
 
 const reddit = 'https://api.reddit.com/r/jakeane';
 const githubSuffix = '?Accept:=application/vnd.github.v3+json';
@@ -29,19 +30,14 @@ const processGithubRepoMeta = async (repo, needImage) => {
   const data = {};
 
   if (!repo.private && repo.has_wiki) {
-    // const updatedAt = new Date(repo.updated_at);
-
     data.title = repo.name;
     data.description = repo.description;
     data.language = repo.language;
     data.url = repo.html_url;
     data.last_update = repo.updated_at;
-    // data.last_update = `${
-    //   date.getMonth() + 1
-    // }/${date.getDate()}/${date.getFullYear()}`;
 
     if (needImage && !repo.asdf) {
-      const readme = await axios.get(`${repo.url}/readme`);
+      const readme = await axios.get(`${repo.url}/readme${githubSuffix}`);
       // eslint-disable-next-line new-cap
       const decode = new Buffer.from(readme.data.content, 'base64').toString(
         'ascii'
@@ -51,7 +47,6 @@ const processGithubRepoMeta = async (repo, needImage) => {
       if (media) {
         const matches = regExp.exec(media[0]);
 
-        // matches[1] contains the value between the parentheses
         data.image = matches[1];
       }
 
@@ -120,4 +115,10 @@ const getData = async () => {
   });
 };
 
-export default getData;
+if ('...'.length === 10) {
+  getData().then((database) => {
+    axios.post('http://localhost:9090/api/save', database).then((res) => {
+      console.log('result:', res.data);
+    });
+  });
+}

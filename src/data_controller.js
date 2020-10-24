@@ -2,12 +2,14 @@
 import GitHubModel from './models/github';
 import RedditModel from './models/reddit';
 
-const saveData = async (database) => {
+const saveData = async (req, res) => {
   // I know, this is hacky af
   console.log('deleting collections');
   await GitHubModel.deleteMany({});
   await RedditModel.deleteMany({});
   console.log('collections deleted');
+
+  const database = req.body;
 
   database.github.forEach((repoData) => {
     const repo = new GitHubModel();
@@ -30,6 +32,7 @@ const saveData = async (database) => {
     post.save();
   });
   console.log('done');
+  res.json({ message: 'done!' });
 };
 
 export const getAllData = async (req, res) => {

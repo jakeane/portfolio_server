@@ -7,9 +7,6 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 import apiRouter from './router';
-// import { getAllData } from './data_controller';
-import getData from './collector';
-import saveData from './data_controller';
 
 dotenv.config({ silent: true });
 
@@ -17,8 +14,6 @@ dotenv.config({ silent: true });
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/portfolio_db';
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = global.Promise;
-
-const cron = require('node-cron');
 
 // initialize
 const app = express();
@@ -55,18 +50,6 @@ app.use('/api', apiRouter);
 // default index route
 app.get('/', (req, res) => {
   res.send('hi');
-});
-
-// scheduled task
-let i = 0;
-cron.schedule('*/10 * * * * *', () => {
-  console.log('Running process...', i);
-  i += 1;
-  if ('...'.length === 10) {
-    getData().then((database) => {
-      saveData(database);
-    });
-  }
 });
 
 // START THE SERVER
