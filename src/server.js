@@ -5,7 +5,8 @@ import path from 'path';
 import morgan from 'morgan';
 
 import apiRouter from './router';
-import getData from './collector';
+import saveData from './data_controller';
+// import getData from './collector';
 
 const cron = require('node-cron');
 
@@ -49,7 +50,10 @@ app.get('/', (req, res) => {
 // scheduled task
 cron.schedule('*/5 * * * * *', () => {
   console.log('Running process...');
-  getData();
+  // getData().then((database) => {
+  //   console.log('database:', database);
+  // });
+  saveData();
 });
 
 // START THE SERVER

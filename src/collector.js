@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable operator-linebreak */
 /* eslint-disable comma-dangle */
 import axios from 'axios';
@@ -6,46 +7,110 @@ const reddit = 'https://api.reddit.com/r/jakeane';
 const githubSuffix = '?Accept:=application/vnd.github.v3+json';
 const github = `https://api.github.com/users/jakeane/repos${githubSuffix}`;
 
+const openstata = `https://api.github.com/repos/dartmouth-cs52-20X/openstata${githubSuffix}`;
+const openstataUrl = 'https://open-stata.netlify.app/';
+const openstataImage =
+  'https://raw.githubusercontent.com/dartmouth-cs52-20X/openstata/master/docs/img/do.gif';
+
 const processRedditPost = (post) => {
-  if (post.data.crosspost_parent_list && post.asdf) {
-    console.log('----------------');
-    console.log('Title:', post.data.title);
-    console.log(
-      'Source:',
-      post.data.crosspost_parent_list[0].subreddit_name_prefixed
-    );
-    console.log('Link:', post.data.url);
-    console.log('----------------');
+  const data = {};
+
+  if (post.data.crosspost_parent_list) {
+    data.headline = post.data.title;
+    data.source = post.data.crosspost_parent_list[0].subreddit_name_prefixed;
+    data.image = post.data.thumbnail;
+    data.link = post.data.url;
   }
+
+  return data;
 };
 
-const processGithubRepoMeta = (repo) => {
-  if (!repo.private && repo.language) {
-    console.log('----------------');
-    console.log('Title:', repo.name);
-    console.log('Description:', repo.description);
-    console.log('Language:', repo.language);
-    console.log('Updated:', repo.updated_at);
-    console.log('To go:', repo.url);
+const processGithubRepoMeta = async (repo, needImage) => {
+  const data = {};
 
-    console.log('----------------');
+  if (!repo.private && repo.has_wiki) {
+    const date = new Date(repo.updated_at);
+
+    data.title = repo.name;
+    data.description = repo.description;
+    data.language = repo.language;
+    data.url = repo.html_url;
+    data.last_update = `${
+      date.getMonth() + 1
+    }/${date.getDate()}/${date.getFullYear()}`;
+
+    if (needImage && !repo.asdf) {
+      const readme = await axios.get(`${repo.url}/readme`);
+      // eslint-disable-next-line new-cap
+      const decode = new Buffer.from(readme.data.content, 'base64').toString(
+        'ascii'
+      );
+      const media = decode.match(/!\[.*\]\(.*\)/);
+      const regExp = /\(([^)]+)\)/;
+      if (media) {
+        const matches = regExp.exec(media[0]);
+
+        // matches[1] contains the value between the parentheses
+        data.image = matches[1];
+      }
+
+      const live = decode.match(/\[website\]\(.*\)/);
+      if (live) {
+        const liveUrl = regExp.exec(live[0]);
+        data.live = liveUrl[1];
+      }
+    } else {
+      data.image = openstataImage;
+      data.live = openstataUrl;
+    }
   }
+  return data;
 };
 
-const getData = () => {
+const getRedditData = async () => {
+  const posts = [];
+  const postList = await axios.get(reddit);
+  postList.data.data.children.forEach((post) => {
+    posts.push(processRedditPost(post));
+  });
+  return posts.filter((post) => {
+    return post.headline;
+  });
+};
+
+const getGithubData = async () => {
+  const repos = [];
+
+  const repoList = await axios.get(github);
+  repoList.data.forEach((repo) => {
+    repos.push(processGithubRepoMeta(repo, true));
+  });
+
+  const openStataData = await axios.get(openstata);
+  repos.push(processGithubRepoMeta(openStataData.data, false));
+
+  const finalRepos = await Promise.all(repos).then((res) => {
+    return res.filter((repo) => {
+      return repo.title;
+    });
+  });
+
+  return finalRepos;
+};
+
+const getData = async () => {
   console.log('collecting data');
 
-  axios.get(reddit).then((res) => {
-    res.data.data.children.forEach((post) => {
-      return processRedditPost(post);
-    });
-  });
+  const database = {};
 
-  axios.get(github).then((res) => {
-    res.data.forEach((repo) => {
-      return processGithubRepoMeta(repo);
-    });
-  });
+  if (github.length !== 3) {
+    database.reddit = await getRedditData();
+  }
+
+  if (github.length !== 3) {
+    database.github = await getGithubData();
+  }
+  return database;
 };
 
 export default getData;
