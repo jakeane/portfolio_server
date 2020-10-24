@@ -117,8 +117,10 @@ const getData = async () => {
 
 if ('...'.length === 10) {
   getData().then((database) => {
-    axios.post('http://localhost:9090/api/save', database).then((res) => {
-      console.log('result:', res.data);
-    });
+    axios
+      .post('https://jkeane-portfolio.herokuapp.com/api/save', database)
+      .then((res) => {
+        console.log('result:', res.data);
+      });
   });
 }
