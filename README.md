@@ -1,7 +1,7 @@
-# starter express app template
+# Portfolio Server
 
-* node with babel
-* expressjs
-* airbnb eslint rules
+![node-cron](https://avatars2.githubusercontent.com/u/43762977?s=400&v=4)
 
-Procfile set up to run on [heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs#deploy-the-app)
+- Collects data from Reddit and GitHub and saves into MongoDB database.
+- Provides API service to query database.
+
