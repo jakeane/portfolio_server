@@ -15,6 +15,7 @@ const saveData = async (database) => {
     repo.description = repoData.description;
     repo.language = repoData.language;
     repo.last_update = repoData.last_update;
+    repo.image = repoData.image;
     repo.url = repoData.url;
     repo.live = repoData.live;
     repo.save();

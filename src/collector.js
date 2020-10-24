@@ -29,15 +29,16 @@ const processGithubRepoMeta = async (repo, needImage) => {
   const data = {};
 
   if (!repo.private && repo.has_wiki) {
-    const date = new Date(repo.updated_at);
+    // const updatedAt = new Date(repo.updated_at);
 
     data.title = repo.name;
     data.description = repo.description;
     data.language = repo.language;
     data.url = repo.html_url;
-    data.last_update = `${
-      date.getMonth() + 1
-    }/${date.getDate()}/${date.getFullYear()}`;
+    data.last_update = repo.updated_at;
+    // data.last_update = `${
+    //   date.getMonth() + 1
+    // }/${date.getDate()}/${date.getFullYear()}`;
 
     if (needImage && !repo.asdf) {
       const readme = await axios.get(`${repo.url}/readme`);

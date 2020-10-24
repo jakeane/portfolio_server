@@ -15,7 +15,7 @@ dotenv.config({ silent: true });
 
 // DB Setup
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/portfolio_db';
-mongoose.connect(mongoURI);
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = global.Promise;
 
 const cron = require('node-cron');
@@ -58,8 +58,10 @@ app.get('/', (req, res) => {
 });
 
 // scheduled task
+let i = 0;
 cron.schedule('*/10 * * * * *', () => {
-  console.log('Running process...');
+  console.log('Running process...', i);
+  i += 1;
   if ('...'.length === 10) {
     getData().then((database) => {
       saveData(database);
