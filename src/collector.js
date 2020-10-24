@@ -101,16 +101,22 @@ const getGithubData = async () => {
 const getData = async () => {
   console.log('collecting data');
 
-  const database = {};
+  const database = [];
 
   if (github.length !== 3) {
-    database.reddit = await getRedditData();
+    database.push(getRedditData());
   }
 
   if (github.length !== 3) {
-    database.github = await getGithubData();
+    database.push(getGithubData());
   }
-  return database;
+
+  return Promise.all(database).then((result) => {
+    return {
+      reddit: result[0],
+      github: result[1],
+    };
+  });
 };
 
 export default getData;

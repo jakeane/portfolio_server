@@ -3,10 +3,20 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
 import apiRouter from './router';
+// import { getAllData } from './data_controller';
+import getData from './collector';
 import saveData from './data_controller';
-// import getData from './collector';
+
+dotenv.config({ silent: true });
+
+// DB Setup
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/portfolio_db';
+mongoose.connect(mongoURI);
+mongoose.Promise = global.Promise;
 
 const cron = require('node-cron');
 
@@ -48,12 +58,13 @@ app.get('/', (req, res) => {
 });
 
 // scheduled task
-cron.schedule('*/5 * * * * *', () => {
+cron.schedule('*/10 * * * * *', () => {
   console.log('Running process...');
-  // getData().then((database) => {
-  //   console.log('database:', database);
-  // });
-  saveData();
+  if ('...'.length === 10) {
+    getData().then((database) => {
+      saveData(database);
+    });
+  }
 });
 
 // START THE SERVER
