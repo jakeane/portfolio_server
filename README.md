@@ -1,8 +1,10 @@
 # jkeane.me Portfolio Backend
 
-This is the codebase for my portfolio backend, where I store data and run scheduled tasks. As I am inherently lazy, I do not want to update my portfolio whenever I am developing something new. To amend this issue, I run a scheduled task in the backend using the Heroku Scheduler plug-in, which uses the GitHub API to get and process data from my repositories.
+This is the codebase for my portfolio backend. It acheives two tasks.
 
-While I was at this, I figured I could use another API to perform a similar task. So, I also use the Reddit API to get data from my personal subreddit, where I cross-post articles that I find interest in.
+First, it runs a scheduled process through the Heroku Scheduler plug-in on the file `collector.js`. This collector calls the GitHub and Reddit APIs, and then it collects data from my GitHub repositories and personal sub-Reddit. After organizing this data, it creates an API call on itself to store the data.
+
+This is where the other task comes into play, it receives data from the scheduler, and it is added into the database. This data is then queried by the portfolio frontend. The only sore issue about this is the fact that I replace the database with every call from the scheduler, so for an instance, the database will be empty. So, in the future, I want to merge in the data provided by the scheduler such that no duplicates are made and all data is up to date.
 
 ## TODO
 
